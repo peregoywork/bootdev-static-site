@@ -1,7 +1,6 @@
-
-
 class HTMLNode:
-    def __init__(self, 
+    def __init__(
+            self, 
             tag: str | None = None, 
             value: str | None = None, 
             children: list['HTMLNode'] | None = None, 
@@ -24,6 +23,36 @@ class HTMLNode:
         ])
 
     def __repr__(self):
-        return f"HTMLNode: tag={self.tag}, value={self.value}, children={self.children}, props={self.props}"
+        return f"HTMLNode({self.tag}, {self.value}, {self.children}, {self.props})"
+
+
+class LeafNode(HTMLNode):
+    def __init__(
+            self, 
+            tag: str, 
+            value: str, 
+            props: dict[str, str] | None = None,
+        ):
+        super().__init__(
+            tag = tag,
+            value = value,
+            children = None, 
+            props = props,
+        )
+
+    def to_html(self):
+        if self.value == None:
+            raise ValueError("LeafNode must have a value, but this one is None")
+        html_str = self.value
+        if self.tag:
+            html_str = f"<{self.tag}" + (f" {self.props}>" if self.props else ">") + html_str + f"</{self.tag}>"
+        return html_str
+
+    def __repr__(self):
+        return f"LeafNode({self.tag}, {self.value}, {self.props})"
+
+
+
+
 
 
