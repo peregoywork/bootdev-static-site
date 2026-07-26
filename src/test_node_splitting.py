@@ -1,6 +1,7 @@
 import unittest
 from textnode import TextNode, TextType, split_nodes_delimiter, split_nodes_image, split_nodes_link
 
+
 class TestNodeSplitting(unittest.TestCase):
     def test_basic_delimiter(self):
         node = TextNode("This is a **text** node", TextType.TEXT)

@@ -1,5 +1,7 @@
 from enum import Enum
 import re
+from htmlnode import HTMLNode
+
 
 class BlockType(Enum):
     PARAGRAPH = "paragraph"
@@ -40,3 +42,7 @@ def block_to_block_type(md_block: str) -> BlockType:
     if all(is_unordered_list): return BlockType.UNORDERED_LIST
     if all(is_ordered_list): return BlockType.ORDERED_LIST
     return BlockType.PARAGRAPH
+
+
+def markdown_to_html(markdown: str) -> HTMLNode:
+    pass
