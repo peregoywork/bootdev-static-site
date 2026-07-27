@@ -1,6 +1,6 @@
 from enum import Enum
 import re
-from htmlnode import HTMLNode
+from htmlnode import HTMLNode, LeafNode
 
 
 class TextType(Enum):
@@ -27,6 +27,25 @@ class TextNode():
 
     def __repr__(self):
         return f"TextNode({self.text}, {self.text_type}, {self.url})"
+
+
+def text_node_to_html_node(text_node: TextNode) -> LeafNode:
+    match text_node.text_type:
+        case TextNode.TEXT: return LeafNode(None, text_node.text)
+        case TextType.BOLD: return LeafNode("b", text_node.text)
+        case TextType.ITALIC: return LeafNode("i", text_node.text)
+        case TextType.CODE: return LeafNode("code", text_node.text)
+        case TextType.LINK:
+            if text_node.url is None:
+                raise ValueError("invalid URL")
+            return LeafNode("a", text_node.text, {"href": text_node.url})
+        case TextType.IMAGE:
+            if text_node.url is None:
+                raise ValueError("invalid URL")
+            return LeafNode("img", "", {"src": text_node.url, "alt": text_node.text})
+        case _:
+            raise ValueError(f"invalid text type: {text_node.text_type}")
+
 
 
 def extract_markdown_images(text: str) -> list[tuple[str, str]]:
