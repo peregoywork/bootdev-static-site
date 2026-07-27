@@ -1,6 +1,4 @@
 from enum import Enum
-import re
-from htmlnode import HTMLNode
 
 
 class BlockType(Enum):
@@ -8,41 +6,43 @@ class BlockType(Enum):
     HEADING = "heading"
     CODE = "code"
     QUOTE = "quote"
-    UNORDERED_LIST = "unordered_list"
     ORDERED_LIST = "ordered_list"
+    UNORDERED_LIST = "unordered_list"
 
 
-def markdown_to_blocks(markdown: str) -> str:
-    return [
-        md.strip()
-        for md in markdown.split("\n\n")
-        if md != ""
-    ]
+def markdown_to_blocks(markdown: str) -> list[str]:
+    blocks = markdown.split("\n\n")
+    filtered_blocks = []
+    for block in blocks:
+        if block == "":
+            continue
+        block = block.strip()
+        filtered_blocks.append(block)
+    return filtered_blocks
 
 
-def block_to_block_type(md_block: str) -> BlockType:
-    is_heading = re.match(r"(#{1,6})", md_block)
-    is_code = re.match(r"\s*`{3}[\s\S]*`{3}\s*", md_block)
-    is_quote = [
-        re.match(r"(>)", md)
-        for md in md_block.split('\n')
-    ]
-    is_unordered_list = [
-        re.match(r"(- )", md)
-        for md in md_block.split('\n')
-    ]
-    is_ordered_list = [
-        re.match(r"(\w\. )", md)
-        for md in md_block.split('\n')
-    ]
-    #
-    if is_heading: return BlockType.HEADING
-    if is_code: return BlockType.CODE
-    if all(is_quote): return BlockType.QUOTE
-    if all(is_unordered_list): return BlockType.UNORDERED_LIST
-    if all(is_ordered_list): return BlockType.ORDERED_LIST
+def block_to_block_type(block: str) -> BlockType:
+    lines = block.split("\n")
+
+    if block.startswith(("# ", "## ", "### ", "#### ", "##### ", "###### ")):
+        return BlockType.HEADING
+    if len(lines) > 1 and lines[0].startswith("```") and lines[-1].startswith("```"):
+        return BlockType.CODE
+    if block.startswith(">"):
+        for line in lines:
+            if not line.startswith(">"):
+                return BlockType.PARAGRAPH
+        return BlockType.QUOTE
+    if block.startswith("- "):
+        for line in lines:
+            if not line.startswith("- "):
+                return BlockType.PARAGRAPH
+        return BlockType.UNORDERED_LIST
+    if block.startswith("1. "):
+        i = 1
+        for line in lines:
+            if not line.startswith(f"{i}. "):
+                return BlockType.PARAGRAPH
+            i += 1
+        return BlockType.ORDERED_LIST
     return BlockType.PARAGRAPH
-
-
-def markdown_to_html(markdown: str) -> HTMLNode:
-    pass
