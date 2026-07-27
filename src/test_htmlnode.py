@@ -1,7 +1,6 @@
 import unittest
 from htmlnode import HTMLNode, LeafNode
-from textnode import markdown_to_html_node
-
+from markdown_blocks import markdown_to_html_node
 
 class TestHTMLNode(unittest.TestCase):
     def test_creation(self):

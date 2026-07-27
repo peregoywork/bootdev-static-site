@@ -47,9 +47,4 @@ def text_node_to_html_node(text_node: TextNode) -> LeafNode:
             raise ValueError(f"invalid text type: {text_node.text_type}")
 
 
-def markdown_to_html_node(markdown) -> HTMLNode:
-    pass
-
-
-
 
