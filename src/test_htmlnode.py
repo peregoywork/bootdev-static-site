@@ -1,5 +1,6 @@
 import unittest
 from htmlnode import HTMLNode, LeafNode
+from textnode import markdown_to_html_node
 
 
 class TestHTMLNode(unittest.TestCase):
@@ -24,7 +25,11 @@ class TestHTMLNode(unittest.TestCase):
 
     def test_can_print(self):
         node = HTMLNode(props={ "href": "https://www.google.com", "target": "_blank" })
-        print(node)
+        self.assertEqual(
+            node.__repr__(),
+            "HTMLNode(None, None, None, {'href': 'https://www.google.com', 'target': '_blank'})"
+        )
+
 
 class TestLeafNode(unittest.TestCase):
     def test_create_leaf(self):
@@ -53,6 +58,41 @@ class TestLeafNode(unittest.TestCase):
             node.__repr__(),
             "LeafNode(span, some text, {'class': 'highlight'})",
         )   
+
+
+class TestMarkdownToHTML(unittest.TestCase):
+    def test_paragraphs(self):
+        md = """
+This is **bolded** paragraph
+text in a p
+tag here
+
+This is another paragraph with _italic_ text and `code` here
+
+    """
+
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertequal(
+            html,
+            "<div><p>this is <b>bolded</b> paragraph text in a p tag here</p><p>this is another paragraph with <i>italic</i> text and <code>code</code> here</p></div>",
+        )
+
+
+    def test_codeblock(self):
+        md = """
+```
+this is text that _should_ remain
+the **same** even with inline stuff
+```
+    """
+
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff\n</code></pre></div>",
+        )
 
 
 if __name__=='__main__':
