@@ -1,9 +1,13 @@
 from textnode import TextNode
+from build_public import build_public_from_static
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def main():
-    tn = TextNode('This is some anchor text', 'link', 'https://www.boot.dev')
-    print(tn)
+    build_public_from_static()
 
 if __name__=='__main__':
     main()
