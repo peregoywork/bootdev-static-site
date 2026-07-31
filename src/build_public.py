@@ -18,11 +18,12 @@ PUBLIC_DIR = BASE_PATH / "public"
 
 if not STATIC_DIR.exists():
     STATIC_DIR.mkdir(parents=True, exist_ok=True)
- 
+
+
 
 def clean_directory(dir: Path):
     shutil.rmtree(dir.resolve())
-    PUBLIC_DIR.mkdir(parents=True, exist_ok=True)
+    dir.mkdir(parents=True, exist_ok=True)
 
 def copy_directory(src: Path, dest: Path):
     for item in src.iterdir():
@@ -31,10 +32,6 @@ def copy_directory(src: Path, dest: Path):
             copy_directory((src / item.name), (dest / item.name))
         if item.is_file():
             shutil.copy((src / item.name), (dest / item.name))
-
-def build_public_from_static():
-    clean_directory(PUBLIC_DIR)
-    copy_directory(STATIC_DIR, PUBLIC_DIR)
 
 def generate_page(from_path, template_path, dest_path):
     logger.info(f"Generating page from {from_path} to {dest_path} using {template_path}")
