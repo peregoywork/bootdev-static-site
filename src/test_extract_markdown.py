@@ -1,5 +1,6 @@
 import unittest
 from inline_markdown import extract_markdown_images, extract_markdown_links
+from extract_markdown import extract_title
 
 
 class TestTextNode(unittest.TestCase):  
@@ -39,4 +40,12 @@ class TestTextNode(unittest.TestCase):
         self.assertListEqual([("to boot dev", "https://www.boot.dev")], link_matches)
         self.assertListEqual([("obi wan", "https://i.imgur.com/fJRm4Vk.jpeg")], image_matches)
 
+    def test_extract_title(self):
+        md = "# title_hello     "
+        title = extract_title(md)
+        self.assertEqual("title_hello", title)
+
+
+if __name__=='__main__':
+    unittest.main()
 
