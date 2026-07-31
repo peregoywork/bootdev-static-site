@@ -1,6 +1,8 @@
 import logging
 import shutil
 from pathlib import Path
+from markdown_blocks import markdown_to_html_node
+from extract_markdown import extract_title
 
 logger = logging.getLogger(__name__)
 
@@ -23,8 +25,6 @@ def clean_directory(dir: Path):
     PUBLIC_DIR.mkdir(parents=True, exist_ok=True)
 
 def copy_directory(src: Path, dest: Path):
-    logger.info(src)
-    logger.info(dest)
     for item in src.iterdir():
         if item.is_dir():
             (dest / item.name).mkdir()
@@ -35,4 +35,27 @@ def copy_directory(src: Path, dest: Path):
 def build_public_from_static():
     clean_directory(PUBLIC_DIR)
     copy_directory(STATIC_DIR, PUBLIC_DIR)
+
+def generate_page(from_path, template_path, dest_path):
+    logger.info(f"Generating page from {from_path} to {dest_path} using {template_path}")
+    src_content = None
+    template = None
+    
+    with open(from_path, 'r') as f:
+        src_content = f.read()
+    with open(template_path, 'r') as f:
+        template = f.read()
+
+    html_node = markdown_to_html_node(src_content).to_html()
+    title = extract_title(src_content)
+
+    template = template.replace('{{ Title }}', title)
+    template = template.replace('{{ Content }}', html_node)
+
+    with open(dest_path, 'w') as f:
+       f.write(template)
+    
+    
+    
+   
 
