@@ -7,18 +7,10 @@ from extract_markdown import extract_title
 logger = logging.getLogger(__name__)
 
 
-
-# read from ../static
-# clean ../public
-# recursively copy all contents to ..public
-
-BASE_PATH = Path(__file__).resolve().parent.parent
-STATIC_DIR = BASE_PATH / "static"
-PUBLIC_DIR = BASE_PATH / "public" 
-
-if not STATIC_DIR.exists():
-    STATIC_DIR.mkdir(parents=True, exist_ok=True)
-
+def ensure_exists(dirs: list[Path]):
+    for d in dirs:
+        if not d.exists():
+            d.mkdir(parents=True, exist_ok=True)
 
 
 def clean_directory(dir_path: Path):
@@ -37,7 +29,7 @@ def copy_directory(src: Path, dest: Path):
             shutil.copy((src / item.name), (dest / item.name))
 
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, basepath):
     logger.info(f"Generating page from {from_path} to {dest_path} using {template_path}")
     src_content = None
     template = None
@@ -52,24 +44,25 @@ def generate_page(from_path, template_path, dest_path):
 
     template = template.replace('{{ Title }}', title)
     template = template.replace('{{ Content }}', html_node)
+    template = template.replace('href="/', f'href="{basepath}')
+    template = template.replace('src="/', f'src="{basepath}')
 
     dest_path = dest_path.with_suffix(".html")
     if not dest_path.exists():
-        logger.info(f"file does not exist. Touch")
         dest_path.parent.mkdir(parents=True, exist_ok=True)
         dest_path.touch()
     with open(dest_path, 'w') as f:
        f.write(template)
     
     
-def generate_pages_recursive(src_dir_path, template_path, dest_dir_path):
+def generate_pages_recursive(src_dir_path, template_path, dest_dir_path, basepath):
     logger.info("begin recusive generation")
     for item in src_dir_path.iterdir():
         src = src_dir_path / item.name
         dest = dest_dir_path / item.name
         if item.is_dir():
-            generate_pages_recursive(src, template_path, dest)
+            generate_pages_recursive(src, template_path, dest, basepath)
         elif item.is_file():
-            generate_page(src, template_path, dest)
+            generate_page(src, template_path, dest, basepath)
 
 
